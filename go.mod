@@ -3,6 +3,8 @@ module github.com/failuretoload/catdata
 go 1.24.2
 
 require (
+	github.com/a-h/templ v0.3.865
+	github.com/go-chi/chi/v5 v5.2.1
 	github.com/jackc/pgx/v5 v5.7.5
 	github.com/pashagolub/pgxmock/v4 v4.7.0
 	github.com/stretchr/testify v1.10.0
