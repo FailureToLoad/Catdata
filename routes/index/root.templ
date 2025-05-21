@@ -1,5 +1,10 @@
 package index
 
+import (
+	"github.com/failuretoload/catdata/routes/weighttable"
+)
+
+
 templ Root() {
 	<!DOCTYPE html>
 	<html lang="en">
@@ -20,7 +25,7 @@ templ Root() {
 templ Page() {
 	@Root() {
 		<div class="flex flex-col gap-6">
-			
+			@weighttable.Content()
 		</div>
 	}
 }
