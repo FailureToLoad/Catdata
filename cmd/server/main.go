@@ -9,6 +9,7 @@ import (
 )
 
 func main() {
+
 	r := chi.NewRouter()
 	index.RegisterRoutes(r)
 
