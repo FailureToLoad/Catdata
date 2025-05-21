@@ -2,7 +2,9 @@ package repo
 
 import (
 	"context"
+	"fmt"
 
+	"github.com/failuretoload/catdata/cat/domain"
 	"github.com/jackc/pgx/v5"
 	"github.com/jackc/pgx/v5/pgconn"
 )
@@ -24,4 +26,33 @@ func NewCatRepo(c Connection) CatRepo {
 	return CatRepo{
 		db: c,
 	}
+}
+
+func (r CatRepo) Query(ctx context.Context, input domain.QueryInput) ([]domain.CatRecord, error) {
+	query := fmt.Sprintf("SELECT * FROM catstats LIMIT %d OFFSET %d",
+		input.Limit,
+		input.Offset,
+	)
+	rows, err := r.db.Query(ctx, query)
+	if err != nil {
+		return nil, fmt.Errorf("query error: %w", err)
+	}
+	defer rows.Close()
+
+	var records []domain.CatRecord
+	for rows.Next() {
+		var record domain.CatRecord
+
+		if err := rows.Scan(&record.ID, &record.Timestamp, &record.Cat, &record.Weight, &record.Notes); err != nil {
+			return nil, fmt.Errorf("scan error: %w", err)
+		}
+
+		records = append(records, record)
+	}
+
+	if err := rows.Err(); err != nil {
+		return nil, fmt.Errorf("row iteration error: %w", err)
+	}
+
+	return records, nil
 }
