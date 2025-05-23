@@ -7,7 +7,7 @@ import (
 	"github.com/failuretoload/catdata/cat/domain"
 )
 
-//go:generate mockgen -source=service.go -destination=mock/mock_service.go -package=mock
+//go:generate mockgen -source=service.go -destination=mock_test.go -package=cat_test
 type (
 	Repo interface {
 		Query(ctx context.Context, input domain.QueryInput) ([]domain.CatRecord, error)

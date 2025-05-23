@@ -3,6 +3,7 @@ package repo
 import (
 	"context"
 	"fmt"
+	"time"
 
 	"github.com/failuretoload/catdata/cat/domain"
 	"github.com/jackc/pgx/v5"
@@ -29,7 +30,7 @@ func NewCatRepo(c Connection) CatRepo {
 }
 
 func (r CatRepo) Query(ctx context.Context, input domain.QueryInput) ([]domain.CatRecord, error) {
-	query := fmt.Sprintf("SELECT * FROM catstats LIMIT %d OFFSET %d",
+	query := fmt.Sprintf("SELECT * FROM stats LIMIT %d OFFSET %d",
 		input.Limit,
 		input.Offset,
 	)
@@ -42,11 +43,11 @@ func (r CatRepo) Query(ctx context.Context, input domain.QueryInput) ([]domain.C
 	var records []domain.CatRecord
 	for rows.Next() {
 		var record domain.CatRecord
-
-		if err := rows.Scan(&record.ID, &record.Timestamp, &record.Cat, &record.Weight, &record.Notes); err != nil {
+		var timestamp time.Time
+		if err := rows.Scan(&record.ID, &record.Cat, &record.Weight, &record.Notes, &timestamp); err != nil {
 			return nil, fmt.Errorf("scan error: %w", err)
 		}
-
+		record.Timestamp = timestamp.Format("01/02/2006 3:04 PM")
 		records = append(records, record)
 	}
 

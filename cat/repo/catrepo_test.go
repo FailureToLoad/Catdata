@@ -8,6 +8,7 @@ import (
 
 	"github.com/failuretoload/catdata/cat/domain"
 	"github.com/failuretoload/catdata/cat/repo"
+	"github.com/google/uuid"
 	"github.com/pashagolub/pgxmock/v4"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
@@ -22,7 +23,8 @@ func TestRepo_Query(t *testing.T) {
 	query := fmt.Sprintf("SELECT .* FROM catstats LIMIT %d OFFSET %d", limit, offset)
 
 	catRepo := repo.NewCatRepo(mock)
-	want := expected()
+	timestamp := time.Now().Local()
+	want := expected(timestamp)
 
 	mock.ExpectQuery(query).
 		WillReturnRows(pgxmock.NewRows([]string{
@@ -34,21 +36,21 @@ func TestRepo_Query(t *testing.T) {
 		}).AddRows(
 			[]any{
 				want[0].ID,
-				want[0].Timestamp,
+				timestamp,
 				want[0].Cat,
 				want[0].Weight,
 				want[0].Notes,
 			},
 			[]any{
 				want[1].ID,
-				want[1].Timestamp,
+				timestamp,
 				want[1].Cat,
 				want[1].Weight,
 				want[1].Notes,
 			},
 			[]any{
 				want[2].ID,
-				want[2].Timestamp,
+				timestamp,
 				want[2].Cat,
 				want[2].Weight,
 				want[2].Notes,
@@ -62,29 +64,30 @@ func TestRepo_Query(t *testing.T) {
 
 }
 
-func expected() []domain.CatRecord {
+func expected(timestamp time.Time) []domain.CatRecord {
 	nimbusNote := "acquiring mass"
 	yetiNote := "wants an egg"
 	romNote := "stop eating carpet"
+	timestring := timestamp.Format("01/02/2006 3:04 PM")
 	return []domain.CatRecord{
 		{
-			ID:        1,
+			ID:        uuid.New(),
 			Cat:       "nimbus",
-			Timestamp: time.Now().Unix(),
+			Timestamp: timestring,
 			Weight:    12,
 			Notes:     &nimbusNote,
 		},
 		{
-			ID:        2,
+			ID:        uuid.New(),
 			Cat:       "yeti",
-			Timestamp: time.Now().Unix(),
+			Timestamp: timestring,
 			Weight:    8,
 			Notes:     &yetiNote,
 		},
 		{
-			ID:        3,
+			ID:        uuid.New(),
 			Cat:       "rom",
-			Timestamp: time.Now().Unix(),
+			Timestamp: timestring,
 			Weight:    11,
 			Notes:     &romNote,
 		},

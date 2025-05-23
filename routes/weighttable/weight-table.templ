@@ -22,7 +22,6 @@ templ Table() {
 					<th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Cat</th>
 					<th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Date</th>
 					<th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Weight (kg)</th>
-					<th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Notes</th>
 				</tr>
 			</thead>
 			<tbody id="weighttablebody" data-on-load={request.GetSSE("/query")} class="bg-white divide-y divide-gray-200">
@@ -37,9 +36,6 @@ templ Rows(records []domain.CatRecord) {
 						<td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">{record.Cat}</td>
 						<td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{record.Timestamp}</td>
 						<td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{record.Weight}</td>
-						if record.Notes != nil {
-							<td class="px-6 py-4 text-sm text-gray-500">{*record.Notes}</td>
-						}	
 					</tr>
 				}
 			</tbody>

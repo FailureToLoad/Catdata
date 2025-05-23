@@ -12,7 +12,9 @@ import (
 	"github.com/failuretoload/catdata/routes/index"
 	"github.com/failuretoload/catdata/routes/weighttable"
 	"github.com/go-chi/chi/v5"
+	"github.com/jackc/pgx/v5"
 	"github.com/jackc/pgx/v5/pgxpool"
+	pgxuuid "github.com/jackc/pgx-gofrs-uuid"
 )
 
 func main() {
@@ -39,6 +41,11 @@ func initConnPool(ctx context.Context) *pgxpool.Pool {
 	config, err := pgxpool.ParseConfig(os.Getenv("CONN_STRING"))
 	if err != nil {
 		log.Fatalf("Unable to parse db config: %v\n", err)
+	}
+
+	config.AfterConnect = func(_ context.Context, conn *pgx.Conn) error {
+		pgxuuid.Register(conn.TypeMap())
+		return nil
 	}
 
 	pool, err := pgxpool.NewWithConfig(ctx, config)

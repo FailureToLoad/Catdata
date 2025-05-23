@@ -1,9 +1,13 @@
 package domain
 
+import (
+	"github.com/google/uuid"
+)
+
 type CatRecord struct {
-	ID        int     `json:"id"`
-	Timestamp int64   `json:"timestamp"`
-	Cat       string  `json:"cat"`
-	Weight    float32 `json:"weight"`
-	Notes     *string `json:"notes"`
+	ID        uuid.UUID
+	Timestamp string
+	Cat       string
+	Weight    float32
+	Notes     *string
 }
