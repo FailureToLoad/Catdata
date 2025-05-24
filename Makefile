@@ -8,7 +8,9 @@ dependencies:
 	tar -xzf "templ_Linux_x86_64.tar.gz"
 	rm "templ_Linux_x86_64.tar.gz"
 	chmod +x "templ"
-	go mod tidy
+
+	curl -sLO https://github.com/saadeghi/daisyui/releases/latest/download/daisyui.js
+	curl -sLO https://github.com/saadeghi/daisyui/releases/latest/download/daisyui-theme.js
 
 templ:
 	$(error templ missing, run make dependencies)
@@ -16,13 +18,19 @@ templ:
 tailwindcss:
 	$(error tailwind missing, run make dependencies)
 
+daisyui.js:
+	$(error daisyui missing, run make dependencies)
+
+daisyui-theme.js:
+	$(error daisyui-theme missing, run make dependencies)
+
 generate: templ
 	./templ generate
 
-css: tailwindcss
+css: tailwindcss daisyui.js daisyui-theme.js
 	./tailwindcss -i ./input.css -o ./static/styles.css --minify
 
-css/watch: tailwindcss
+css/watch: tailwindcss daisyui.js daisyui-theme.js
 	./tailwindcss -i ./input.css -o ./assets/css/output.css --watch
 
 run: generate
