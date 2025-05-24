@@ -41,6 +41,20 @@ func (m *MockRepo) EXPECT() *MockRepoMockRecorder {
 	return m.recorder
 }
 
+// Insert mocks base method.
+func (m *MockRepo) Insert(ctx context.Context, cat string, weight float32, notes *string) error {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "Insert", ctx, cat, weight, notes)
+	ret0, _ := ret[0].(error)
+	return ret0
+}
+
+// Insert indicates an expected call of Insert.
+func (mr *MockRepoMockRecorder) Insert(ctx, cat, weight, notes any) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Insert", reflect.TypeOf((*MockRepo)(nil).Insert), ctx, cat, weight, notes)
+}
+
 // Query mocks base method.
 func (m *MockRepo) Query(ctx context.Context, input domain.QueryInput) ([]domain.CatRecord, error) {
 	m.ctrl.T.Helper()

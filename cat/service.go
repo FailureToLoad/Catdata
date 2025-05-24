@@ -11,6 +11,7 @@ import (
 type (
 	Repo interface {
 		Query(ctx context.Context, input domain.QueryInput) ([]domain.CatRecord, error)
+		Insert(ctx context.Context, cat string, weight float32, notes *string) error
 	}
 	Service struct {
 		repo Repo
@@ -42,4 +43,18 @@ func (s Service) Cats(ctx context.Context, offset, limit int) ([]domain.CatRecor
 	}
 
 	return s.repo.Query(ctx, input)
+}
+
+func (s Service) AddRecord(ctx context.Context, cat string, weight float32, notes *string) error {
+	if cat == "" {
+		return errors.New("cat name cannot be empty")
+	}
+	if weight <= 0 {
+		return errors.New("cat weight must be positive")
+	}
+	if notes != nil && *notes == "" {
+		return errors.New("cannot submit empty notes")
+	}
+
+	return s.repo.Insert(ctx, cat, weight, notes)
 }
