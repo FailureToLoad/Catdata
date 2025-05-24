@@ -34,5 +34,5 @@ func (c Controller) fetchRows(w http.ResponseWriter, r *http.Request) {
 	}
 
 	sse := datastar.NewSSE(w, r)
-	sse.MergeFragmentTempl(Rows(rows))
+	sse.MergeFragmentTempl(tableRows(rows))
 }
