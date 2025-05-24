@@ -63,7 +63,74 @@ func TestRepo_Query(t *testing.T) {
 	assert.ElementsMatch(t, got, want)
 
 }
+func TestRepo_Insert(t *testing.T) {
+	mock, err := pgxmock.NewPool()
+	require.NoError(t, err)
+	defer mock.Close()
 
+	catRepo := repo.NewCatRepo(mock)
+
+	tests := []struct {
+		name      string
+		cat       string
+		weight    float32
+		notes     *string
+		setup     func(cat string, weight float32, notes *string)
+		wantErr   bool
+		assertion func(t require.TestingT, err error, msgAndArgs ...interface{})
+	}{
+		{
+			name:   "successful insert with notes",
+			cat:    "nimbus",
+			weight: 12.5,
+			notes:  ptr("soft"),
+			setup: func(cat string, weight float32, notes *string) {
+				mock.ExpectExec("INSERT INTO cat_records").
+					WithArgs(cat, weight, notes).
+					WillReturnResult(pgxmock.NewResult("INSERT", 1))
+			},
+			assertion: require.NoError,
+		},
+		{
+			name:   "successful insert with nil notes",
+			cat:    "yeti",
+			weight: 10.0,
+			notes:  nil,
+			setup: func(cat string, weight float32, notes *string) {
+				mock.ExpectExec("INSERT INTO cat_records").
+					WithArgs(cat, weight, notes).
+					WillReturnResult(pgxmock.NewResult("INSERT", 1))
+			},
+			assertion: require.NoError,
+		},
+		{
+			name:   "insert error",
+			cat:    "rom",
+			weight: 11.0,
+			notes:  ptr("hungry"),
+			setup: func(cat string, weight float32, notes *string) {
+				mock.ExpectExec("INSERT INTO cat_records").
+					WithArgs(cat, weight, notes).
+					WillReturnError(fmt.Errorf("db error"))
+			},
+			assertion: require.Error,
+		},
+	}
+
+	for _, tt := range tests {
+		tt := tt
+		t.Run(tt.name, func(t *testing.T) {
+			tt.setup(tt.cat, tt.weight, tt.notes)
+			err := catRepo.Insert(context.Background(), tt.cat, tt.weight, tt.notes)
+			tt.assertion(t, err)
+			require.NoError(t, mock.ExpectationsWereMet())
+		})
+	}
+}
+
+func ptr(s string) *string {
+	return &s
+}
 func expected(timestamp time.Time) []domain.CatRecord {
 	nimbusNote := "acquiring mass"
 	yetiNote := "wants an egg"

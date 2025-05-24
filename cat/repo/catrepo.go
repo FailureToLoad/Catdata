@@ -57,3 +57,9 @@ func (r CatRepo) Query(ctx context.Context, input domain.QueryInput) ([]domain.C
 
 	return records, nil
 }
+
+func (r CatRepo) Insert(ctx context.Context, cat string, weight float32, notes *string) error {
+	cmd := `INSERT INTO cat_records (cat_name, weight, notes, timestamp) VALUES ($1, $2, $3, NOW())`
+	_, err := r.db.Exec(ctx, cmd, cat, weight, notes)
+	return err
+}
