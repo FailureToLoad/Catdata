@@ -12,6 +12,8 @@ dependencies:
 	curl -sLO https://github.com/saadeghi/daisyui/releases/latest/download/daisyui.js
 	curl -sLO https://github.com/saadeghi/daisyui/releases/latest/download/daisyui-theme.js
 
+	go install github.com/air-verse/air@latest
+
 templ:
 	$(error templ missing, run make dependencies)
 
@@ -30,14 +32,18 @@ generate: templ
 css: tailwindcss daisyui.js daisyui-theme.js
 	./tailwindcss -i ./input.css -o ./static/styles.css --minify
 
-css/watch: tailwindcss daisyui.js daisyui-theme.js
-	./tailwindcss -i ./input.css -o ./assets/css/output.css --watch
-
 run: generate
 	go run cmd/server/main.go
 
 build: generate
 	go build -o ./bin/server cmd/server/main.go
+
+watch: templ tailwindcss daisyui.js daisyui-theme.js
+	@trap 'kill $$(jobs -p) 2>/dev/null; exit' INT TERM; \
+	./templ generate --watch & \
+	./tailwindcss -i ./input.css -o ./static/styles.css --watch & \
+	air --build.cmd "go build -o bin/api cmd/server/main.go" --build.bin "./bin/api" & \
+	wait
 
 clean:
 	rm -rf bin
