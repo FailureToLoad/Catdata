@@ -6,8 +6,6 @@ import (
 	"log/slog"
 	"net/http"
 	"os"
-	"path/filepath"
-	"strings"
 
 	"github.com/failuretoload/catdata/cat"
 	catrepo "github.com/failuretoload/catdata/cat/repo"
@@ -22,14 +20,14 @@ import (
 func main() {
 
 	r := chi.NewRouter()
+	serveCSS(r)
+	serveFavicon(r)
 	index.RegisterRoutes(r)
 
 	ctx := context.Background()
 	pool := initConnPool(ctx)
 	wtc := makeWeightTableController(pool)
 	wtc.RegisterRoutes(r)
-
-	serveStatic(r)
 
 	slog.Info("server started on :8080")
 	http.ListenAndServe(":8080", r)
@@ -59,24 +57,17 @@ func initConnPool(ctx context.Context) *pgxpool.Pool {
 	return pool
 }
 
-func serveStatic(r chi.Router) {
-	path := "/static"
-	workDir, _ := os.Getwd()
-	root := http.Dir(filepath.Join(workDir, "static"))
-	if strings.ContainsAny(path, "{}*") {
-		panic("FileServer does not permit any URL parameters.")
-	}
+func serveCSS(r chi.Router) {
+	r.Get("/static/styles.css", func(w http.ResponseWriter, r *http.Request) {
+		w.Header().Set("Content-Type", "text/css")
+		http.ServeFile(w, r, "./static/styles.css")
+	})
+}
 
-	if path != "/" && path[len(path)-1] != '/' {
-		r.Get(path, http.RedirectHandler(path+"/", http.StatusMovedPermanently).ServeHTTP)
-		path += "/"
-	}
-	path += "*"
-
-	r.Get(path, func(w http.ResponseWriter, r *http.Request) {
-		rctx := chi.RouteContext(r.Context())
-		pathPrefix := strings.TrimSuffix(rctx.RoutePattern(), "/*")
-		fs := http.StripPrefix(pathPrefix, http.FileServer(root))
-		fs.ServeHTTP(w, r)
+func serveFavicon(r chi.Router) {
+	r.Get("/favicon.ico", func(w http.ResponseWriter, r *http.Request) {
+		w.Header().Set("Content-Type", "image/x-icon")
+		w.Header().Set("Cache-Control", "public, max-age=31536000") // Cache for 1 year
+		http.ServeFile(w, r, "./static/favicon.ico")
 	})
 }
