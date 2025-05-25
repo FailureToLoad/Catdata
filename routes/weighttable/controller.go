@@ -1,12 +1,15 @@
 package weighttable
 
 import (
+	"math"
 	"net/http"
 	"strconv"
 
 	"github.com/failuretoload/catdata/cat"
+	"github.com/failuretoload/catdata/cat/domain"
 	"github.com/failuretoload/catdata/response"
 	"github.com/go-chi/chi/v5"
+	"github.com/google/uuid"
 
 	datastar "github.com/starfederation/datastar/sdk/go"
 )
@@ -66,7 +69,54 @@ func (c Controller) updateTable(w http.ResponseWriter, r *http.Request, limit, o
 	if err != nil {
 		response.InternalServerError(ctx, w, "unable to request records", err)
 	}
-
+	dtoSlice := toDTOSlice(rows)
 	sse := datastar.NewSSE(w, r)
-	sse.MergeFragmentTempl(tableRows(rows))
+	sse.MergeFragmentTempl(tableRows(dtoSlice))
+}
+
+func toDTOSlice(rows []domain.CatRecord) []CatRowDTO {
+	result := []CatRowDTO{}
+	for _, row := range rows {
+		pounds, ounces := kgToPoundsOunces(row.Weight)
+
+		dto := CatRowDTO{
+			ID:        row.ID,
+			Cat:       row.Cat,
+			Timestamp: row.Timestamp,
+			WeightKG:  row.Weight,
+			WeightLB:  pounds,
+			WeightOZ:  ounces,
+			Notes:     row.Notes,
+		}
+		result = append(result, dto)
+	}
+	return result
+}
+
+func kgToPoundsOunces(kg float32) (int, float32) {
+	totalPounds := kg * 2.20462
+
+	pounds := int(totalPounds)
+
+	remainingPounds := totalPounds - float32(pounds)
+	ounces := remainingPounds * 16
+
+	ounces = float32(math.Round(float64(ounces)*10) / 10)
+
+	if ounces >= 16.0 {
+		pounds++
+		ounces = 0.0
+	}
+
+	return pounds, ounces
+}
+
+type CatRowDTO struct {
+	ID        uuid.UUID
+	Cat       string
+	Timestamp string
+	WeightKG  float32
+	WeightLB  int
+	WeightOZ  float32
+	Notes     *string
 }

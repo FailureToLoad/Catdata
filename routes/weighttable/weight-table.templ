@@ -1,9 +1,5 @@
 package weighttable
 
-import (
-	"github.com/failuretoload/catdata/cat/domain"
-)
-
 templ Content() {
 	<div class="flex flex-col overflow-hidden bg-white rounded-lg shadow-lg">
 		@addRowModal()
@@ -83,26 +79,34 @@ templ addRowModal() {
 }
 
 templ table() {
-	<table class="min-w-full divide-y divide-gray-200">
-			<thead class="bg-gray-50">
+	<table class="min-w-full table-fixed divide-y divide-gray-200" data-signals="{metric:true}">
+			<thead class=" bg-gray-50">
 				<tr>
-					<th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Cat</th>
-					<th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Date</th>
-					<th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Weight (kg)</th>
+					<th class="w-1/5 px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Cat</th>
+					<th class="w-2/5 px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Date</th>
+					<th class="w-2/5 px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer select-none"
+						data-on-click="$metric=!$metric"
+					>
+						<span data-show="$metric">Metric</span>
+						<span data-show="!$metric">Imperial</span>
+                	</th>
 				</tr>
 			</thead>
-			<tbody id="weighttablebody" data-on-load="@get('/query')" class="bg-white divide-y divide-gray-200">
+			<tbody id="weighttablebody" data-on-load="@get('/query')" class="bg-white divide-y divide-gray-200 ">
 			</tbody>
 		</table>
 }
 
-templ tableRows(records []domain.CatRecord) {
+templ tableRows(records []CatRowDTO) {
 	<tbody id="weighttablebody" class="bg-white divide-y divide-gray-200">
 				for _, record := range records {
 					<tr>
 						<td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">{record.Cat}</td>
-						<td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{record.Timestamp}</td>
-						<td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{record.Weight}</td>
+						<td class="px-6 py-4 max-w-min whitespace-nowrap text-sm text-gray-500">{record.Timestamp}</td>
+						<td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+							<span data-show="$metric">{record.WeightKG}kg</span>
+							<span data-show="!$metric">{record.WeightLB}lb {record.WeightOZ}oz</span>
+						</td>
 					</tr>
 				}
 			</tbody>

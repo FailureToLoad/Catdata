@@ -9,7 +9,7 @@ dependencies:
 	go install github.com/a-h/templ/cmd/templ@latest
 
 
-generate:
+generate: css
 	templ generate
 
 css:  
