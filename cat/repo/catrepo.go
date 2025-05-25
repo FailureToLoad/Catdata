@@ -46,7 +46,7 @@ func (r CatRepo) Query(ctx context.Context, input domain.QueryInput) ([]domain.C
 		if err := rows.Scan(&record.ID, &record.Cat, &record.Weight, &record.Notes, &timestamp); err != nil {
 			return nil, fmt.Errorf("scan error: %w", err)
 		}
-		record.Timestamp = timestamp.Format("01/02/2006 3:04 PM")
+		record.Timestamp = timestamp.Format("01/02/2006")
 		records = append(records, record)
 	}
 	if err := rows.Err(); err != nil {
