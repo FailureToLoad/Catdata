@@ -15,7 +15,7 @@ templ Root() {
 		<link rel="stylesheet" href="/static/styles.css"></link>
 		<script type="module" src="https://cdn.jsdelivr.net/gh/starfederation/datastar@v1.0.0-beta.11/bundles/datastar.js"></script>
 	</head>
-	<body id="body" class="bg-white dark:bg-gray-900 text-lg max-w-xl mx-auto my-16">
+	<body id="body" class="bg-white dark:bg-gray-900 text-lg max-w-xl mx-auto ">
 		{ children... }
 	</body>
 	<footer id="footer"></footer>
@@ -24,6 +24,6 @@ templ Root() {
 
 templ Page() {
 	@Root() {
-		@weighttable.Content()
+		@weighttable.Table()
 	}
 }

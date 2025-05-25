@@ -21,12 +21,14 @@ run: generate
 build: generate
 	go build -o ./bin/server cmd/server/main.go
 
-watch: 
-	@trap 'kill $$(jobs -p) 2>/dev/null; exit' INT TERM; \
-	templ generate --watch & \
-	npm run watch & \
-	air --build.cmd "go build -o bin/server cmd/server/main.go" --build.bin "./bin/server" & \
-	wait
+watchcss: generate
+	npm run watch
+
+watchtempl: generate
+	templ generate --watch
+
+watch: generate
+	air --build.cmd "go build -o bin/server cmd/server/main.go" --build.bin "./bin/server"
 
 clean:
 	rm -rf bin
