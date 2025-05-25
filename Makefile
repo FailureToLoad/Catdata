@@ -10,7 +10,7 @@ dependencies:
 
 
 generate:
-	./templ generate
+	templ generate
 
 css:  
 	npm run build

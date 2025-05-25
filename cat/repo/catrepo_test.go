@@ -85,7 +85,7 @@ func TestRepo_Insert(t *testing.T) {
 			weight: 12.5,
 			notes:  ptr("soft"),
 			setup: func(cat string, weight float32, notes *string) {
-				mock.ExpectExec("INSERT INTO cat_records").
+				mock.ExpectExec("INSERT INTO stats").
 					WithArgs(cat, weight, notes).
 					WillReturnResult(pgxmock.NewResult("INSERT", 1))
 			},
@@ -97,7 +97,7 @@ func TestRepo_Insert(t *testing.T) {
 			weight: 10.0,
 			notes:  nil,
 			setup: func(cat string, weight float32, notes *string) {
-				mock.ExpectExec("INSERT INTO cat_records").
+				mock.ExpectExec("INSERT INTO stats").
 					WithArgs(cat, weight, notes).
 					WillReturnResult(pgxmock.NewResult("INSERT", 1))
 			},
@@ -109,7 +109,7 @@ func TestRepo_Insert(t *testing.T) {
 			weight: 11.0,
 			notes:  ptr("hungry"),
 			setup: func(cat string, weight float32, notes *string) {
-				mock.ExpectExec("INSERT INTO cat_records").
+				mock.ExpectExec("INSERT INTO stats").
 					WithArgs(cat, weight, notes).
 					WillReturnError(fmt.Errorf("db error"))
 			},

@@ -30,7 +30,7 @@ func NewCatRepo(c Connection) CatRepo {
 }
 
 func (r CatRepo) Query(ctx context.Context, input domain.QueryInput) ([]domain.CatRecord, error) {
-	query := fmt.Sprintf("SELECT * FROM stats LIMIT %d OFFSET %d",
+	query := fmt.Sprintf("SELECT * FROM stats ORDER BY timestamp DESC LIMIT %d OFFSET %d",
 		input.Limit,
 		input.Offset,
 	)
@@ -39,7 +39,6 @@ func (r CatRepo) Query(ctx context.Context, input domain.QueryInput) ([]domain.C
 		return nil, fmt.Errorf("query error: %w", err)
 	}
 	defer rows.Close()
-
 	var records []domain.CatRecord
 	for rows.Next() {
 		var record domain.CatRecord
@@ -50,16 +49,14 @@ func (r CatRepo) Query(ctx context.Context, input domain.QueryInput) ([]domain.C
 		record.Timestamp = timestamp.Format("01/02/2006 3:04 PM")
 		records = append(records, record)
 	}
-
 	if err := rows.Err(); err != nil {
 		return nil, fmt.Errorf("row iteration error: %w", err)
 	}
-
 	return records, nil
 }
 
 func (r CatRepo) Insert(ctx context.Context, cat string, weight float32, notes *string) error {
-	cmd := `INSERT INTO cat_records (cat_name, weight, notes, timestamp) VALUES ($1, $2, $3, NOW())`
+	cmd := `INSERT INTO stats (cat, weight, notes, timestamp) VALUES ($1, $2, $3, NOW())`
 	_, err := r.db.Exec(ctx, cmd, cat, weight, notes)
 	return err
 }
